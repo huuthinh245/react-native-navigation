@@ -59,7 +59,7 @@
     "@types/react": "16.x.x",
     "@types/react-native": "0.57.7",
     "@types/react-test-renderer": "16.x.x",
-    "jsc-android": "236355.x.x",
+    "jsc-android": "git+https://github.com/Kudo/jsc-android-buildscripts.git#develop",
     "detox": "12.1.x",
     "react-native-ui-lib": "3.x.x",
     "handlebars": "4.x.x",
