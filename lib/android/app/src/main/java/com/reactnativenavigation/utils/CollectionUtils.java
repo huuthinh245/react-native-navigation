@@ -1,7 +1,7 @@
 package com.reactnativenavigation.utils;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,6 +94,17 @@ public class CollectionUtils {
         if (isNullOrEmpty(items)) return null;
         for (T item : items) {
             if (by.filter(item)) return item;
+        }
+        return null;
+    }
+
+    public static @Nullable <T> T first(@Nullable Collection<T> items, Filter<T> by, Functions.Func1<T> apply) {
+        if (isNullOrEmpty(items)) return null;
+        for (T item : items) {
+            if (by.filter(item)) {
+                apply.run(item);
+                return item;
+            }
         }
         return null;
     }

@@ -1,21 +1,17 @@
 package com.reactnativenavigation.presentation;
 
 import android.graphics.Color;
-import android.support.annotation.IntRange;
-import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
+import androidx.annotation.IntRange;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation.TitleState;
 import com.reactnativenavigation.anim.BottomTabsAnimator;
 import com.reactnativenavigation.parse.AnimationsOptions;
 import com.reactnativenavigation.parse.BottomTabsOptions;
 import com.reactnativenavigation.parse.Options;
-import com.reactnativenavigation.utils.UiUtils;
 import com.reactnativenavigation.viewcontrollers.ViewController;
 import com.reactnativenavigation.viewcontrollers.bottomtabs.BottomTabFinder;
 import com.reactnativenavigation.viewcontrollers.bottomtabs.TabSelector;
 import com.reactnativenavigation.views.BottomTabs;
-import com.reactnativenavigation.views.Component;
 
 import java.util.List;
 
@@ -43,11 +39,6 @@ public class BottomTabsPresenter {
         animator = new BottomTabsAnimator(bottomTabs);
     }
 
-    public void applyLayoutParamsOptions(Options options, int tabIndex) {
-        Options withDefaultOptions = options.copy().withDefaultOptions(defaultOptions);
-        applyDrawBehind(withDefaultOptions.bottomTabsOptions, tabIndex);
-    }
-
     public void mergeOptions(Options options) {
         mergeBottomTabsOptions(options.bottomTabsOptions, options.animations);
     }
@@ -57,19 +48,19 @@ public class BottomTabsPresenter {
         applyBottomTabsOptions(withDefaultOptions.bottomTabsOptions, withDefaultOptions.animations);
     }
 
-    public void applyChildOptions(Options options, Component child) {
-        int tabIndex = bottomTabFinder.findByComponent(child);
+    public void applyChildOptions(Options options, ViewController child) {
+        int tabIndex = bottomTabFinder.findByControllerId(child.getId());
         if (tabIndex >= 0) {
             Options withDefaultOptions = options.copy().withDefaultOptions(defaultOptions);
             applyBottomTabsOptions(withDefaultOptions.bottomTabsOptions, withDefaultOptions.animations);
-            applyDrawBehind(withDefaultOptions.bottomTabsOptions, tabIndex);
+            applyDrawBehind(tabIndex);
         }
     }
 
-    public void mergeChildOptions(Options options, Component child) {
+    public void mergeChildOptions(Options options, ViewController child) {
         mergeBottomTabsOptions(options.bottomTabsOptions, options.animations);
-        int tabIndex = bottomTabFinder.findByComponent(child);
-        if (tabIndex >= 0) mergeDrawBehind(options.bottomTabsOptions, tabIndex);
+        int tabIndex = bottomTabFinder.findByControllerId(child.getId());
+        if (tabIndex >= 0) mergeDrawBehind(tabIndex);
     }
 
     private void mergeBottomTabsOptions(BottomTabsOptions options, AnimationsOptions animations) {
@@ -106,34 +97,12 @@ public class BottomTabsPresenter {
         }
     }
 
-    private void applyDrawBehind(BottomTabsOptions options, @IntRange(from = 0) int tabIndex) {
-        ViewGroup tab = tabs.get(tabIndex).getView();
-        MarginLayoutParams lp = (MarginLayoutParams) tab.getLayoutParams();
-        if (options.drawBehind.isTrue()) {
-            lp.bottomMargin = 0;
-        }
-        if (options.visible.isTrueOrUndefined() && options.drawBehind.isFalseOrUndefined()) {
-            if (bottomTabs.getHeight() == 0) {
-                UiUtils.runOnPreDrawOnce(bottomTabs, () -> lp.bottomMargin = bottomTabs.getHeight());
-            } else {
-                lp.bottomMargin = bottomTabs.getHeight();
-            }
-        }
+    private void applyDrawBehind(@IntRange(from = 0) int tabIndex) {
+        tabs.get(tabIndex).applyBottomInset();
     }
 
-    private void mergeDrawBehind(BottomTabsOptions options, int tabIndex) {
-        ViewGroup tab = tabs.get(tabIndex).getView();
-        MarginLayoutParams lp = (MarginLayoutParams) tab.getLayoutParams();
-        if (options.drawBehind.isTrue()) {
-            lp.bottomMargin = 0;
-        }
-        if (options.visible.isTrue() && options.drawBehind.isFalse()) {
-            if (bottomTabs.getHeight() == 0) {
-                UiUtils.runOnPreDrawOnce(bottomTabs, () -> lp.bottomMargin = bottomTabs.getHeight());
-            } else {
-                lp.bottomMargin = bottomTabs.getHeight();
-            }
-        }
+    private void mergeDrawBehind(int tabIndex) {
+        tabs.get(tabIndex).applyBottomInset();
     }
 
     private void applyBottomTabsOptions(BottomTabsOptions options, AnimationsOptions animationsOptions) {

@@ -5,34 +5,29 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
-import android.support.annotation.RestrictTo;
-import android.support.annotation.VisibleForTesting;
-import android.support.design.widget.AppBarLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.reactnativenavigation.BuildConfig;
 import com.reactnativenavigation.R;
-import com.reactnativenavigation.anim.TopBarAnimator;
 import com.reactnativenavigation.anim.TopBarCollapseBehavior;
 import com.reactnativenavigation.interfaces.ScrollEventListener;
 import com.reactnativenavigation.parse.Alignment;
-import com.reactnativenavigation.parse.AnimationOptions;
 import com.reactnativenavigation.parse.params.Colour;
 import com.reactnativenavigation.parse.params.Number;
 import com.reactnativenavigation.utils.CompatUtils;
 import com.reactnativenavigation.utils.UiUtils;
 import com.reactnativenavigation.viewcontrollers.TitleBarButtonController;
-import com.reactnativenavigation.views.StackLayout;
 import com.reactnativenavigation.views.titlebar.TitleBar;
 import com.reactnativenavigation.views.toptabs.TopTabs;
 
@@ -46,24 +41,23 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 public class TopBar extends AppBarLayout implements ScrollEventListener.ScrollAwareView {
     private TitleBar titleBar;
     private final TopBarCollapseBehavior collapsingBehavior;
-    private TopBarAnimator animator;
     private TopTabs topTabs;
     private FrameLayout root;
     private View border;
     private View component;
     private float elevation = -1;
 
-    public TopBar(final Context context, StackLayout parentView) {
+    public TopBar(final Context context) {
         super(context);
         context.setTheme(R.style.TopBar);
         collapsingBehavior = new TopBarCollapseBehavior(this);
         topTabs = new TopTabs(getContext());
-        animator = new TopBarAnimator(this, parentView.getStackId());
         createLayout();
     }
 
     private void createLayout() {
         setId(CompatUtils.generateViewId());
+        setFitsSystemWindows(true);
         titleBar = createTitleBar(getContext());
         topTabs = createTopTabs();
         border = createBorder();
@@ -254,36 +248,6 @@ public class TopBar extends AppBarLayout implements ScrollEventListener.ScrollAw
         collapsingBehavior.disableCollapse();
     }
 
-    public void show() {
-        if (visible() || animator.isAnimatingShow()) return;
-        resetAnimationOptions();
-        setVisibility(View.VISIBLE);
-    }
-
-    private boolean visible() {
-        return getVisibility() == View.VISIBLE;
-    }
-
-    public void showAnimate(AnimationOptions options) {
-        if (visible() || animator.isAnimatingShow()) return;
-        animator.show(options);
-    }
-
-    public void hide() {
-        if (!animator.isAnimatingHide()) {
-            setVisibility(View.GONE);
-        }
-    }
-
-    public void hideAnimate(AnimationOptions options) {
-        hideAnimate(options, () -> {});
-    }
-
-    public void hideAnimate(AnimationOptions options, Runnable onAnimationEnd) {
-        if (!visible()) return;
-        animator.hide(options, onAnimationEnd);
-    }
-
     public void clearBackgroundComponent() {
         if (component != null) {
             root.removeView(component);
@@ -298,27 +262,6 @@ public class TopBar extends AppBarLayout implements ScrollEventListener.ScrollAw
     @VisibleForTesting
     public TopTabs getTopTabs() {
         return topTabs;
-    }
-
-    @VisibleForTesting
-    public void setAnimator(TopBarAnimator animator) {
-        this.animator = animator;
-    }
-
-    @RestrictTo(RestrictTo.Scope.TESTS)
-    public TextView getTitleTextView() {
-        return titleBar.findTitleTextView();
-    }
-
-    public void resetAnimationOptions() {
-        setTranslationY(0);
-        setTranslationX(0);
-        setAlpha(1);
-        setScaleY(1);
-        setScaleX(1);
-        setRotationX(0);
-        setRotationY(0);
-        setRotation(0);
     }
 
     public void setBorderHeight(double height) {

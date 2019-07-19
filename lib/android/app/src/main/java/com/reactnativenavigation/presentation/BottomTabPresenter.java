@@ -2,17 +2,17 @@ package com.reactnativenavigation.presentation;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
 
-import com.reactnativenavigation.parse.*;
-import com.reactnativenavigation.utils.*;
-import com.reactnativenavigation.viewcontrollers.*;
-import com.reactnativenavigation.viewcontrollers.bottomtabs.*;
-import com.reactnativenavigation.views.*;
-import com.reactnativenavigation.views.Component;
+import com.reactnativenavigation.parse.BottomTabOptions;
+import com.reactnativenavigation.parse.Options;
+import com.reactnativenavigation.utils.ImageLoader;
+import com.reactnativenavigation.utils.ImageLoadingListenerAdapter;
+import com.reactnativenavigation.viewcontrollers.ViewController;
+import com.reactnativenavigation.viewcontrollers.bottomtabs.BottomTabFinder;
+import com.reactnativenavigation.views.BottomTabs;
 
-import java.util.*;
+import java.util.List;
 
 public class BottomTabPresenter {
     private final Context context;
@@ -20,8 +20,6 @@ public class BottomTabPresenter {
     private Options defaultOptions;
     private final BottomTabFinder bottomTabFinder;
     private BottomTabs bottomTabs;
-    private final int defaultSelectedTextColor;
-    private final int defaultTextColor;
     private final List<ViewController> tabs;
 
     public BottomTabPresenter(Context context, List<ViewController> tabs, ImageLoader imageLoader, Options defaultOptions) {
@@ -30,8 +28,6 @@ public class BottomTabPresenter {
         this.bottomTabFinder = new BottomTabFinder(tabs);
         this.imageLoader = imageLoader;
         this.defaultOptions = defaultOptions;
-        defaultSelectedTextColor = defaultOptions.bottomTabOptions.selectedIconColor.get(ContextCompat.getColor(context, com.aurelhubert.ahbottomnavigation.R.color.colorBottomNavigationAccent));
-        defaultTextColor = defaultOptions.bottomTabOptions.iconColor.get(ContextCompat.getColor(context, com.aurelhubert.ahbottomnavigation.R.color.colorBottomNavigationInactive));
     }
 
     public void setDefaultOptions(Options defaultOptions) {
@@ -58,8 +54,8 @@ public class BottomTabPresenter {
         }
     }
 
-    public void mergeChildOptions(Options options, Component child) {
-        int index = bottomTabFinder.findByComponent(child);
+    public void mergeChildOptions(Options options, ViewController child) {
+        int index = bottomTabFinder.findByControllerId(child.getId());
         if (index >= 0) {
             BottomTabOptions bto = options.bottomTabOptions;
             if (bto.badge.hasValue()) bottomTabs.setBadge(index, bto.badge.get());
